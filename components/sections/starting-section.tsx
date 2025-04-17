@@ -7,9 +7,27 @@ import { Button } from "@/components/ui/button"
 import { useIntersectionObserver } from "@/hooks/use-intersection-observer"
 import { fadeIn, staggerContainer } from "@/lib/animation-variants"
 import { OptimizedImage } from "@/components/ui/optimized-image"
+import { useEffect, useState } from "react"
 
 export default function StartingSection() {
   const [startingRef, startingInView] = useIntersectionObserver({ threshold: 0.1 })
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  // Check if the user is on a desktop device
+  useEffect(() => {
+    const checkIfDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024) // lg breakpoint
+    }
+
+    // Initial check
+    checkIfDesktop()
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIfDesktop)
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIfDesktop)
+  }, [])
 
   return (
     <section className="w-full py-8 md:py-12 lg:py-24 bg-green-50" ref={startingRef as React.RefObject<HTMLElement>}>
@@ -22,7 +40,10 @@ export default function StartingSection() {
             animate={startingInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            <div className="relative max-w-md mx-auto lg:max-w-full lg:w-[90%] xl:w-[85%]">
+            {/* Reduced image size on desktop */}
+            <div
+              className={`relative mx-auto ${isDesktop ? "max-w-sm lg:max-w-md" : "max-w-md lg:max-w-full lg:w-[90%] xl:w-[85%]"}`}
+            >
               {/* Apply rounded corners to the image wrapper */}
               <div className="rounded-lg overflow-hidden shadow-md">
                 <OptimizedImage
@@ -44,7 +65,8 @@ export default function StartingSection() {
             variants={fadeIn}
           >
             <div className="text-center lg:text-left">
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tighter sm:text-4xl">Démarrer est simple</h2>
+              {/* Increased font size for the title */}
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter">Démarrer est simple</h2>
             </div>
 
             {/* Mobile image - only shown on smallest screens */}
